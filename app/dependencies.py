@@ -5,12 +5,18 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.application.internal.command_services.default_learning_path_command_service import DefaultLearningPathCommandService
 from app.application.internal.command_services.default_learning_path_recommendation_service import DefaultLearningPathRecommendationService
+from app.application.internal.command_services.default_certificate_command_service import DefaultCertificateCommandService
+from app.application.internal.command_services.default_certificate_validation_service import DefaultCertificateValidationService
+from app.application.internal.query_service.default_certificate_query_service import DefaultCertificateQueryService
 from app.application.internal.query_service.default_learning_path_query_service import DefaultLearningPathQueryService
 from app.infrastructure.clients.gap_analysis_service_client import GapAnalysisServiceClient
+from app.infrastructure.clients.identity_service_client import IdentityServiceClient
 from app.infrastructure.clients.youtube_data_api_client import YouTubeDataApiClient
 from app.infrastructure.configuration.settings import get_settings
 from app.infrastructure.persistence.sqlalchemy.database import get_session
 from app.infrastructure.persistence.sqlalchemy.repositories.sqlalchemy_learning_path_repository import SQLAlchemyLearningPathRepository
+from app.infrastructure.persistence.sqlalchemy.repositories.sqlalchemy_certificate_repository import SQLAlchemyCertificateRepository
+from app.infrastructure.ocr.tesseract_certificate_text_extractor import TesseractCertificateTextExtractor
 
 
 async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
@@ -50,3 +56,24 @@ def get_learning_path_command_service(session: AsyncSession) -> DefaultLearningP
 
 def get_learning_path_query_service(session: AsyncSession) -> DefaultLearningPathQueryService:
     return DefaultLearningPathQueryService(SQLAlchemyLearningPathRepository(session))
+
+
+def get_certificate_validation_service() -> DefaultCertificateValidationService:
+    settings = get_settings()
+    return DefaultCertificateValidationService(
+        text_extractor=TesseractCertificateTextExtractor(),
+        identity_profile_client=IdentityServiceClient(settings.identity_service_url),
+    )
+
+
+def get_certificate_command_service(session: AsyncSession) -> DefaultCertificateCommandService:
+    return DefaultCertificateCommandService(
+        validation_service=get_certificate_validation_service(),
+        certificate_repository=SQLAlchemyCertificateRepository(session),
+        learning_path_repository=SQLAlchemyLearningPathRepository(session),
+        commit=session.commit,
+    )
+
+
+def get_certificate_query_service(session: AsyncSession) -> DefaultCertificateQueryService:
+    return DefaultCertificateQueryService(SQLAlchemyCertificateRepository(session))

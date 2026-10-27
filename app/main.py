@@ -4,6 +4,7 @@ from fastapi import FastAPI
 
 from app.infrastructure.configuration.settings import get_settings
 from app.interfaces.rest.controller.learning_path_controller import router as learning_paths_router
+from app.interfaces.rest.controller.certificate_controller import router as certificates_router
 
 
 @asynccontextmanager
@@ -19,6 +20,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 app.include_router(learning_paths_router)
+app.include_router(certificates_router)
 
 
 @app.get("/health", tags=["Health"])

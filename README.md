@@ -7,7 +7,7 @@ Esta primera entrega solo prepara el esqueleto técnico: servicio aislado, confi
 ## Configuración local
 
 1. Crea una base PostgreSQL, por ejemplo `learning_pathway_db`.
-2. Define las variables `DATABASE_URL`, `GAP_ANALYSIS_SERVICE_URL`, `YOUTUBE_DATA_API_KEY` y `GATEWAY_USER_ID_HEADER`.
+2. Define las variables `DATABASE_URL`, `IDENTITY_SERVICE_URL`, `GAP_ANALYSIS_SERVICE_URL`, `YOUTUBE_DATA_API_KEY` y `GATEWAY_USER_ID_HEADER`.
 3. Instala las dependencias, aplica la migración y ejecuta el servicio:
 
 ```powershell

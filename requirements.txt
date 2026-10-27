@@ -8,3 +8,7 @@ alembic==1.16.5
 pytest==8.4.1
 pytest-asyncio==1.1.0
 respx==0.22.0
+python-multipart
+PyMuPDF<2
+Pillow
+pytesseract

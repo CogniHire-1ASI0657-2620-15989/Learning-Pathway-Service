@@ -6,6 +6,7 @@ from app.main import app
 
 def test_health_check(monkeypatch) -> None:
     monkeypatch.setenv("DATABASE_URL", "postgresql+psycopg://pathbridge:pathbridge@localhost:5432/learning_pathway_db")
+    monkeypatch.setenv("IDENTITY_SERVICE_URL", "http://identity-service:8000")
     monkeypatch.setenv("GAP_ANALYSIS_SERVICE_URL", "http://gap-analysis-service:8000")
     monkeypatch.setenv("YOUTUBE_DATA_API_KEY", "test-api-key")
     monkeypatch.setenv("GATEWAY_USER_ID_HEADER", "X-User-Id")
