@@ -11,11 +11,25 @@ load_dotenv()
 @dataclass(frozen=True)
 class Settings:
     database_url: str
+    gap_analysis_service_url: str
+    youtube_data_api_key: str
+    gateway_user_id_header: str
 
 
 @lru_cache
 def get_settings() -> Settings:
-    database_url = os.getenv("DATABASE_URL")
-    if not database_url or not database_url.strip():
-        raise RuntimeError("Missing required configuration: DATABASE_URL")
-    return Settings(database_url=database_url.strip())
+    values = {
+        "DATABASE_URL": os.getenv("DATABASE_URL"),
+        "GAP_ANALYSIS_SERVICE_URL": os.getenv("GAP_ANALYSIS_SERVICE_URL"),
+        "YOUTUBE_DATA_API_KEY": os.getenv("YOUTUBE_DATA_API_KEY"),
+        "GATEWAY_USER_ID_HEADER": os.getenv("GATEWAY_USER_ID_HEADER"),
+    }
+    missing = [name for name, value in values.items() if not value or not value.strip()]
+    if missing:
+        raise RuntimeError(f"Missing required configuration: {', '.join(missing)}")
+    return Settings(
+        database_url=values["DATABASE_URL"].strip(),
+        gap_analysis_service_url=values["GAP_ANALYSIS_SERVICE_URL"].rstrip("/"),
+        youtube_data_api_key=values["YOUTUBE_DATA_API_KEY"].strip(),
+        gateway_user_id_header=values["GATEWAY_USER_ID_HEADER"].strip(),
+    )
