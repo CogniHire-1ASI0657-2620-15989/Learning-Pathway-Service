@@ -16,3 +16,12 @@ def test_health_check(monkeypatch) -> None:
 
     assert response.status_code == 200
     assert response.json() == {"service": "learning-pathway", "status": "healthy"}
+
+
+def test_registers_learning_path_routes() -> None:
+    routes = {route.path for route in app.routes}
+
+    assert "/api/v1/learning-paths" in routes
+    assert "/api/v1/learning-paths/{job_id}" in routes
+    assert "/api/v1/learning-paths/{learning_path_id}/items/{item_id}" in routes
+    assert "/api/v1/learning-paths/{learning_path_id}/progress" in routes

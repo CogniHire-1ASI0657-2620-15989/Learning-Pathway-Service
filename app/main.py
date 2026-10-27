@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from app.infrastructure.configuration.settings import get_settings
+from app.interfaces.rest.controller.learning_path_controller import router as learning_paths_router
 
 
 @asynccontextmanager
@@ -17,6 +18,7 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan,
 )
+app.include_router(learning_paths_router)
 
 
 @app.get("/health", tags=["Health"])

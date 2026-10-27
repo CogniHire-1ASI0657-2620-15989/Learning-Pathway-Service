@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import datetime
 
 from app.application.ports.gap_analysis_client import GapAnalysisClient
 from app.application.ports.youtube_video_search_client import YouTubeVideo, YouTubeVideoSearchClient
@@ -15,6 +16,7 @@ class VideoRecommendation:
 @dataclass(frozen=True)
 class LearningPathRecommendation:
     gap_report_id: int
+    gap_report_updated_at: datetime
     recommendations: list[VideoRecommendation]
 
 
@@ -42,4 +44,8 @@ class DefaultLearningPathRecommendationService:
                 for offset, video in enumerate(videos[: self.VIDEOS_PER_SKILL])
             )
 
-        return LearningPathRecommendation(gap_report_id=report.id, recommendations=recommendations)
+        return LearningPathRecommendation(
+            gap_report_id=report.id,
+            gap_report_updated_at=report.updated_at,
+            recommendations=recommendations,
+        )
