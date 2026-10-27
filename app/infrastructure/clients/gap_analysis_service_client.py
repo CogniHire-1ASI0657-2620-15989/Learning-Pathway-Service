@@ -24,6 +24,27 @@ class GapAnalysisServiceClient(GapAnalysisClient):
         except httpx.HTTPError as exc:
             raise RuntimeError("Gap Analysis Service is unavailable.") from exc
 
+        return self._to_report(body)
+
+    async def regenerate_report(self, user_id: int, job_id: int) -> GapAnalysisReport:
+        try:
+            async with httpx.AsyncClient(timeout=httpx.Timeout(5.0)) as client:
+                response = await client.post(
+                    f"{self._base_url}/api/v1/gap-reports",
+                    headers={self._user_id_header: str(user_id)},
+                    json={"job_id": job_id},
+                )
+            if response.status_code == 404:
+                raise ValueError("Job or user profile not found for gap report regeneration.")
+            response.raise_for_status()
+            body = response.json()
+        except httpx.HTTPError as exc:
+            raise RuntimeError("Gap Analysis Service is unavailable.") from exc
+
+        return self._to_report(body)
+
+    @staticmethod
+    def _to_report(body: dict) -> GapAnalysisReport:
         return GapAnalysisReport(
             id=int(body["id"]),
             job_id=int(body["job_id"]),

@@ -67,3 +67,17 @@ async def get_certificate(
     if certificate is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Certificate not found.")
     return CertificateResourceFromEntityAssembler.to_resource(certificate)
+
+
+@router.post("/{certificate_id}/synchronization", response_model=CertificateResource)
+async def synchronize_certificate(
+    certificate_id: int,
+    user_id: int = Depends(get_current_user_id),
+    session: AsyncSession = Depends(get_db_session),
+) -> CertificateResource:
+    service: DefaultCertificateCommandService = get_certificate_command_service(session)
+    try:
+        certificate = await service.handle_synchronize(user_id=user_id, certificate_id=certificate_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+    return CertificateResourceFromEntityAssembler.to_resource(certificate)

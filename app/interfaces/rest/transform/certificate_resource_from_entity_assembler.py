@@ -17,6 +17,11 @@ class CertificateResourceFromEntityAssembler:
             detected_course_title=certificate.detected_course_title,
             detected_provider=certificate.detected_provider,
             validation_detail=certificate.validation_detail,
+            profile_sync_status=certificate.profile_sync_status.value,
+            gap_refresh_status=certificate.gap_refresh_status.value,
+            synchronization_detail=certificate.synchronization_detail,
+            profile_synced_at=certificate.profile_synced_at,
+            gap_refreshed_at=certificate.gap_refreshed_at,
             created_at=certificate.created_at,
             updated_at=certificate.updated_at,
         )

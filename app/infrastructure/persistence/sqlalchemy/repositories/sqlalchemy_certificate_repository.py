@@ -2,6 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.model.entities.certificate import Certificate
 from app.domain.model.value_objects.certificate_status import CertificateStatus
+from app.domain.model.value_objects.certificate_synchronization_status import CertificateSynchronizationStatus
 from app.domain.repositories.certificate_repository import CertificateRepository
 from app.infrastructure.persistence.sqlalchemy.models.certificate_model import CertificateModel
 
@@ -41,6 +42,11 @@ class SQLAlchemyCertificateRepository(CertificateRepository):
         model.detected_course_title = certificate.detected_course_title
         model.detected_provider = certificate.detected_provider
         model.validation_detail = certificate.validation_detail
+        model.profile_sync_status = certificate.profile_sync_status.value
+        model.gap_refresh_status = certificate.gap_refresh_status.value
+        model.synchronization_detail = certificate.synchronization_detail
+        model.profile_synced_at = certificate.profile_synced_at
+        model.gap_refreshed_at = certificate.gap_refreshed_at
         model.created_at = certificate.created_at
         model.updated_at = certificate.updated_at
 
@@ -62,6 +68,11 @@ class SQLAlchemyCertificateRepository(CertificateRepository):
             detected_course_title=model.detected_course_title,
             detected_provider=model.detected_provider,
             validation_detail=model.validation_detail,
+            profile_sync_status=CertificateSynchronizationStatus(model.profile_sync_status),
+            gap_refresh_status=CertificateSynchronizationStatus(model.gap_refresh_status),
+            synchronization_detail=model.synchronization_detail,
+            profile_synced_at=model.profile_synced_at,
+            gap_refreshed_at=model.gap_refreshed_at,
             created_at=model.created_at,
             updated_at=model.updated_at,
         )

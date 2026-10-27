@@ -7,3 +7,6 @@ from app.domain.model.entities.certificate import Certificate
 class CertificateCommandService(ABC):
     @abstractmethod
     async def handle_upload(self, command: UploadCertificateCommand) -> Certificate: ...
+
+    @abstractmethod
+    async def handle_synchronize(self, user_id: int, certificate_id: int) -> Certificate: ...

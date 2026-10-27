@@ -41,6 +41,29 @@ async def test_gets_missing_hard_skills_from_gap_analysis() -> None:
 
 @respx.mock
 @pytest.mark.asyncio
+async def test_regenerates_gap_report_after_a_verified_skill_is_promoted() -> None:
+    route = respx.post("http://gap-analysis:8000/api/v1/gap-reports").mock(
+        return_value=Response(
+            201,
+            json={
+                "id": 9,
+                "job_id": 44,
+                "updated_at": "2026-10-27T12:00:00Z",
+                "missing_hard_skills": [],
+            },
+        )
+    )
+
+    report = await GapAnalysisServiceClient("http://gap-analysis:8000", "X-User-Id").regenerate_report(7, 44)
+
+    assert route.called
+    assert route.calls.last.request.headers["X-User-Id"] == "7"
+    assert route.calls.last.request.content == b'{"job_id":44}'
+    assert report.missing_hard_skills == []
+
+
+@respx.mock
+@pytest.mark.asyncio
 async def test_searches_youtube_videos_by_skill() -> None:
     route = respx.get("https://www.googleapis.com/youtube/v3/search").mock(
         return_value=Response(

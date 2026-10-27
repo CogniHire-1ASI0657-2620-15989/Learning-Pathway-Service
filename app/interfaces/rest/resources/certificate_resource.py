@@ -15,5 +15,10 @@ class CertificateResource(BaseModel):
     detected_course_title: str | None = None
     detected_provider: str | None = None
     validation_detail: str | None = None
+    profile_sync_status: str
+    gap_refresh_status: str
+    synchronization_detail: str | None = None
+    profile_synced_at: datetime | None = None
+    gap_refreshed_at: datetime | None = None
     created_at: datetime
     updated_at: datetime

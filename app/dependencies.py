@@ -71,6 +71,8 @@ def get_certificate_command_service(session: AsyncSession) -> DefaultCertificate
         validation_service=get_certificate_validation_service(),
         certificate_repository=SQLAlchemyCertificateRepository(session),
         learning_path_repository=SQLAlchemyLearningPathRepository(session),
+        identity_skill_client=IdentityServiceClient(settings.identity_service_url),
+        gap_analysis_client=GapAnalysisServiceClient(settings.gap_analysis_service_url, settings.gateway_user_id_header),
         commit=session.commit,
     )
 

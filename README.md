@@ -1,8 +1,8 @@
 # Learning Pathway Service
 
-Microservicio FastAPI responsable de las rutas de aprendizaje de PathBridge.
+Microservicio FastAPI responsable de las rutas de aprendizaje de PathBridge. Genera recursos de YouTube a partir de brechas técnicas, registra el avance manual de videos y valida certificados por OCR.
 
-Esta primera entrega solo prepara el esqueleto técnico: servicio aislado, configuración, acceso a su futura base PostgreSQL, Alembic y health check. Las rutas de aprendizaje, las integraciones y los modelos de negocio se incorporarán en los siguientes incrementos.
+Al aprobar un certificado, agrega de forma idempotente la habilidad como `hard_skill` en Identity Service y solicita a Gap Analysis el recálculo para el empleo de la ruta. No asigna un nivel no demostrado. La respuesta del certificado incluye el estado de ambas sincronizaciones para permitir seguimiento y reintentos seguros.
 
 ## Configuración local
 
@@ -17,6 +17,13 @@ alembic upgrade head
 uvicorn app.main:app --reload --port 8003
 ```
 
-## Endpoint disponible
+## Endpoints disponibles
 
 - `GET /health`
+- `POST /api/v1/learning-paths`
+- `GET /api/v1/learning-paths/{job_id}`
+- `PATCH /api/v1/learning-paths/{learning_path_id}/items/{item_id}`
+- `GET /api/v1/learning-paths/{learning_path_id}/progress`
+- `POST /api/v1/certificates` (multipart: `learning_path_id`, `skill_name`, `provider` opcional y `file`)
+- `GET /api/v1/certificates/{certificate_id}`
+- `POST /api/v1/certificates/{certificate_id}/synchronization` para reintentar una sincronización fallida.

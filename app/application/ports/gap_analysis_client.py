@@ -20,3 +20,6 @@ class GapAnalysisReport:
 class GapAnalysisClient(ABC):
     @abstractmethod
     async def get_report(self, user_id: int, job_id: int) -> GapAnalysisReport: ...
+
+    @abstractmethod
+    async def regenerate_report(self, user_id: int, job_id: int) -> GapAnalysisReport: ...
