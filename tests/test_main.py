@@ -26,3 +26,5 @@ def test_registers_learning_path_routes() -> None:
     assert "/api/v1/learning-paths/{job_id}" in routes
     assert "/api/v1/learning-paths/{learning_path_id}/items/{item_id}" in routes
     assert "/api/v1/learning-paths/{learning_path_id}/progress" in routes
+    assert "/api/v1/certificates" in routes
+    assert "/api/v1/certificates/{certificate_id}" in routes

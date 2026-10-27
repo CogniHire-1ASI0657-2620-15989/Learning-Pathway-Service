@@ -1,6 +1,6 @@
 from io import BytesIO
 
-import fitz
+import pymupdf
 import pytesseract
 from PIL import Image
 
@@ -14,14 +14,14 @@ class TesseractCertificateTextExtractor(CertificateTextExtractor):
         return self._extract_image_text(content)
 
     def _extract_pdf_text(self, content: bytes) -> str:
-        document = fitz.open(stream=content, filetype="pdf")
+        document = pymupdf.open(stream=content, filetype="pdf")
         try:
             text = "\n".join(page.get_text() for page in document)
             if text.strip():
                 return text
             if document.page_count == 0:
                 return ""
-            pixmap = document[0].get_pixmap(matrix=fitz.Matrix(2, 2), alpha=False)
+            pixmap = document[0].get_pixmap(matrix=pymupdf.Matrix(2, 2), alpha=False)
             image = Image.frombytes("RGB", (pixmap.width, pixmap.height), pixmap.samples)
             return pytesseract.image_to_string(image, lang="spa+eng")
         finally:
