@@ -21,6 +21,8 @@ class YouTubeDataApiClient(YouTubeVideoSearchClient):
                         "type": "video",
                         "q": skill_name,
                         "maxResults": max_results,
+                        "videoDuration": "long",
+                        "relevanceLanguage": "es",
                         "key": self._api_key,
                     },
                 )
