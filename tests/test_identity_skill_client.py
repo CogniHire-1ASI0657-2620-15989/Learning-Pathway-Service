@@ -12,7 +12,8 @@ async def test_promotes_verified_skill_through_identity_internal_endpoint() -> N
         return_value=Response(204)
     )
 
-    await IdentityServiceClient("http://identity:8000").ensure_verified_hard_skill(7, "SQL")
+    await IdentityServiceClient("http://identity:8000", "test-internal-key").ensure_verified_hard_skill(7, "SQL")
 
     assert route.called
     assert route.calls.last.request.content == b'{"name":"SQL"}'
+    assert route.calls.last.request.headers["X-Internal-Api-Key"] == "test-internal-key"

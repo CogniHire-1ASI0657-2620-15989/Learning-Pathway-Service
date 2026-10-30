@@ -31,10 +31,11 @@ async def test_gets_missing_hard_skills_from_gap_analysis() -> None:
         )
     )
 
-    report = await GapAnalysisServiceClient("http://gap-analysis:8000", "X-User-Id").get_report(7, 44)
+    report = await GapAnalysisServiceClient("http://gap-analysis:8000", "X-User-Id", "test-internal-key").get_report(7, 44)
 
     assert route.called
     assert route.calls.last.request.headers["X-User-Id"] == "7"
+    assert route.calls.last.request.headers["X-Internal-Api-Key"] == "test-internal-key"
     assert report.id == 9
     assert report.missing_hard_skills == [MissingSkill("SQL", "hard"), MissingSkill("Docker", "hard")]
 
@@ -54,10 +55,11 @@ async def test_regenerates_gap_report_after_a_verified_skill_is_promoted() -> No
         )
     )
 
-    report = await GapAnalysisServiceClient("http://gap-analysis:8000", "X-User-Id").regenerate_report(7, 44)
+    report = await GapAnalysisServiceClient("http://gap-analysis:8000", "X-User-Id", "test-internal-key").regenerate_report(7, 44)
 
     assert route.called
     assert route.calls.last.request.headers["X-User-Id"] == "7"
+    assert route.calls.last.request.headers["X-Internal-Api-Key"] == "test-internal-key"
     assert route.calls.last.request.content == b'{"job_id":44}'
     assert report.missing_hard_skills == []
 

@@ -13,7 +13,12 @@ class Base(DeclarativeBase):
 
 @lru_cache
 def get_session_factory() -> async_sessionmaker[AsyncSession]:
-    engine = create_async_engine(get_settings().database_url, pool_pre_ping=True)
+    settings = get_settings()
+    engine = create_async_engine(
+        settings.database_url,
+        pool_pre_ping=True,
+        connect_args={"options": f"-csearch_path={settings.database_schema}"},
+    )
     return async_sessionmaker(engine, expire_on_commit=False, autoflush=False)
 
 

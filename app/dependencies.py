@@ -41,7 +41,11 @@ def get_current_user_id(request: Request) -> int:
 def get_learning_path_recommendation_service() -> DefaultLearningPathRecommendationService:
     settings = get_settings()
     return DefaultLearningPathRecommendationService(
-        gap_analysis_client=GapAnalysisServiceClient(settings.gap_analysis_service_url, settings.gateway_user_id_header),
+        gap_analysis_client=GapAnalysisServiceClient(
+            settings.gap_analysis_service_url,
+            settings.gateway_user_id_header,
+            settings.internal_api_key,
+        ),
         youtube_video_search_client=YouTubeDataApiClient(settings.youtube_data_api_key),
     )
 
@@ -62,7 +66,7 @@ def get_certificate_validation_service() -> DefaultCertificateValidationService:
     settings = get_settings()
     return DefaultCertificateValidationService(
         text_extractor=TesseractCertificateTextExtractor(),
-        identity_profile_client=IdentityServiceClient(settings.identity_service_url),
+        identity_profile_client=IdentityServiceClient(settings.identity_service_url, settings.internal_api_key),
     )
 
 
@@ -71,8 +75,12 @@ def get_certificate_command_service(session: AsyncSession) -> DefaultCertificate
         validation_service=get_certificate_validation_service(),
         certificate_repository=SQLAlchemyCertificateRepository(session),
         learning_path_repository=SQLAlchemyLearningPathRepository(session),
-        identity_skill_client=IdentityServiceClient(settings.identity_service_url),
-        gap_analysis_client=GapAnalysisServiceClient(settings.gap_analysis_service_url, settings.gateway_user_id_header),
+        identity_skill_client=IdentityServiceClient(settings.identity_service_url, settings.internal_api_key),
+        gap_analysis_client=GapAnalysisServiceClient(
+            settings.gap_analysis_service_url,
+            settings.gateway_user_id_header,
+            settings.internal_api_key,
+        ),
         commit=session.commit,
     )
 

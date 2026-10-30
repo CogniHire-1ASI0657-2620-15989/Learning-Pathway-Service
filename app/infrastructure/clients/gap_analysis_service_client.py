@@ -6,16 +6,20 @@ from app.application.ports.gap_analysis_client import GapAnalysisClient, GapAnal
 
 
 class GapAnalysisServiceClient(GapAnalysisClient):
-    def __init__(self, base_url: str, user_id_header: str):
+    def __init__(self, base_url: str, user_id_header: str, internal_api_key: str):
         self._base_url = base_url.rstrip("/")
         self._user_id_header = user_id_header
+        self._internal_api_key = internal_api_key
 
     async def get_report(self, user_id: int, job_id: int) -> GapAnalysisReport:
         try:
-            async with httpx.AsyncClient(timeout=httpx.Timeout(3.0)) as client:
+            async with httpx.AsyncClient(timeout=httpx.Timeout(30.0)) as client:
                 response = await client.get(
                     f"{self._base_url}/api/v1/gap-reports/{job_id}",
-                    headers={self._user_id_header: str(user_id)},
+                    headers={
+                        self._user_id_header: str(user_id),
+                        "X-Internal-Api-Key": self._internal_api_key,
+                    },
                 )
             if response.status_code == 404:
                 raise ValueError("Gap report not found.")
@@ -28,10 +32,13 @@ class GapAnalysisServiceClient(GapAnalysisClient):
 
     async def regenerate_report(self, user_id: int, job_id: int) -> GapAnalysisReport:
         try:
-            async with httpx.AsyncClient(timeout=httpx.Timeout(5.0)) as client:
+            async with httpx.AsyncClient(timeout=httpx.Timeout(30.0)) as client:
                 response = await client.post(
                     f"{self._base_url}/api/v1/gap-reports",
-                    headers={self._user_id_header: str(user_id)},
+                    headers={
+                        self._user_id_header: str(user_id),
+                        "X-Internal-Api-Key": self._internal_api_key,
+                    },
                     json={"job_id": job_id},
                 )
             if response.status_code == 404:
