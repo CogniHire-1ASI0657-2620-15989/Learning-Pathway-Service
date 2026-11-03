@@ -1,4 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 
 from app.domain.model.entities.certificate import Certificate
 from app.domain.model.value_objects.certificate_status import CertificateStatus
@@ -25,6 +26,14 @@ class SQLAlchemyCertificateRepository(CertificateRepository):
         if model is None or model.user_id != user_id:
             return None
         return self._to_entity(model)
+
+    async def list_by_user(self, user_id: int, learning_path_id: int | None = None) -> list[Certificate]:
+        statement = select(CertificateModel).where(CertificateModel.user_id == user_id)
+        if learning_path_id is not None:
+            statement = statement.where(CertificateModel.learning_path_id == learning_path_id)
+        statement = statement.order_by(CertificateModel.created_at.desc(), CertificateModel.id.desc())
+        models = (await self._session.scalars(statement)).all()
+        return [self._to_entity(model) for model in models]
 
     @staticmethod
     def _copy_to_model(certificate: Certificate, model: CertificateModel) -> None:

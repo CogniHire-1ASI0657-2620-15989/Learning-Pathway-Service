@@ -21,6 +21,9 @@ def test_health_check(monkeypatch) -> None:
 
 def test_registers_learning_path_routes() -> None:
     routes = {route.path for route in app.routes}
+    certificate_collection_methods = set().union(
+        *(route.methods or set() for route in app.routes if route.path == "/api/v1/certificates")
+    )
 
     assert "/api/v1/learning-paths" in routes
     assert "/api/v1/learning-paths/{job_id}" in routes
@@ -29,3 +32,5 @@ def test_registers_learning_path_routes() -> None:
     assert "/api/v1/certificates" in routes
     assert "/api/v1/certificates/{certificate_id}" in routes
     assert "/api/v1/certificates/{certificate_id}/synchronization" in routes
+    assert "GET" in certificate_collection_methods
+    assert "POST" in certificate_collection_methods

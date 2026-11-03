@@ -9,3 +9,6 @@ class CertificateRepository(ABC):
 
     @abstractmethod
     async def find_by_id_and_user(self, certificate_id: int, user_id: int) -> Certificate | None: ...
+
+    @abstractmethod
+    async def list_by_user(self, user_id: int, learning_path_id: int | None = None) -> list[Certificate]: ...

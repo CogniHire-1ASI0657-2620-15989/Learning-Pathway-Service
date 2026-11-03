@@ -25,5 +25,6 @@ uvicorn app.main:app --reload --port 8003
 - `PATCH /api/v1/learning-paths/{learning_path_id}/items/{item_id}`
 - `GET /api/v1/learning-paths/{learning_path_id}/progress`
 - `POST /api/v1/certificates` (multipart: `learning_path_id`, `skill_name`, `provider` opcional y `file`)
+- `GET /api/v1/certificates?learning_path_id={id}` para listar certificados propios, opcionalmente filtrados por ruta.
 - `GET /api/v1/certificates/{certificate_id}`
 - `POST /api/v1/certificates/{certificate_id}/synchronization` para reintentar una sincronización fallida.
