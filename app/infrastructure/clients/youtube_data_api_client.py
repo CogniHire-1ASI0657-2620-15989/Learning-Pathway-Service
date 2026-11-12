@@ -1,6 +1,7 @@
 import httpx
 
 from app.application.ports.youtube_video_search_client import YouTubeVideo, YouTubeVideoSearchClient
+from app.observability import outbound_headers
 
 
 class YouTubeDataApiClient(YouTubeVideoSearchClient):
@@ -16,6 +17,7 @@ class YouTubeDataApiClient(YouTubeVideoSearchClient):
             async with httpx.AsyncClient(timeout=httpx.Timeout(3.0)) as client:
                 response = await client.get(
                     self._SEARCH_URL,
+                    headers=outbound_headers(),
                     params={
                         "part": "snippet",
                         "type": "video",

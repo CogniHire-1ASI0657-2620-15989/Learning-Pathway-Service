@@ -2,6 +2,7 @@ import httpx
 
 from app.application.ports.identity_profile_client import IdentityProfileClient, UserProfile
 from app.application.ports.identity_skill_client import IdentitySkillClient
+from app.observability import outbound_headers
 
 
 class IdentityServiceClient(IdentityProfileClient, IdentitySkillClient):
@@ -14,7 +15,7 @@ class IdentityServiceClient(IdentityProfileClient, IdentitySkillClient):
             async with httpx.AsyncClient(timeout=httpx.Timeout(30.0)) as client:
                 response = await client.get(
                     f"{self._base_url}/api/v1/internal/users/{user_id}/job-profile",
-                    headers={"X-Internal-Api-Key": self._internal_api_key},
+                    headers=outbound_headers({"X-Internal-Api-Key": self._internal_api_key}),
                 )
             if response.status_code == 404:
                 raise ValueError("User profile not found.")
@@ -30,7 +31,7 @@ class IdentityServiceClient(IdentityProfileClient, IdentitySkillClient):
                 response = await client.post(
                     f"{self._base_url}/api/v1/internal/users/{user_id}/verified-hard-skills",
                     json={"name": skill_name},
-                    headers={"X-Internal-Api-Key": self._internal_api_key},
+                    headers=outbound_headers({"X-Internal-Api-Key": self._internal_api_key}),
                 )
             if response.status_code == 404:
                 raise ValueError("User profile not found.")
