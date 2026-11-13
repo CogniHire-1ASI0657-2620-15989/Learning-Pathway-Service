@@ -4,6 +4,7 @@ from secrets import compare_digest
 from fastapi import FastAPI, Request
 
 from app.infrastructure.configuration.settings import get_settings
+from app.dependencies import get_redis_cache
 from app.interfaces.rest.controller.learning_path_controller import router as learning_paths_router
 from app.interfaces.rest.controller.certificate_controller import router as certificates_router
 from app.observability import install_observability, problem_response
@@ -12,7 +13,10 @@ from app.observability import install_observability, problem_response
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     get_settings()
-    yield
+    try:
+        yield
+    finally:
+        await get_redis_cache().close()
 
 
 app = FastAPI(

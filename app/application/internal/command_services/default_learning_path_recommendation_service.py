@@ -55,7 +55,7 @@ class DefaultLearningPathRecommendationService:
         recommendations: list[VideoRecommendation] = []
 
         for skill in report.missing_hard_skills:
-            query = f"Curso completo de {skill.name}"
+            query = self.video_search_query(skill.name)
             candidates = await self._youtube_video_search_client.search_videos(query, self.CANDIDATES_PER_SKILL)
             videos = self._select_learning_videos(skill.name, candidates)
             first_position = len(recommendations) + 1
@@ -74,6 +74,10 @@ class DefaultLearningPathRecommendationService:
             gap_report_updated_at=report.updated_at,
             recommendations=recommendations,
         )
+
+    @staticmethod
+    def video_search_query(skill_name: str) -> str:
+        return f"Curso completo de {skill_name}"
 
     @classmethod
     def _select_learning_videos(cls, skill_name: str, candidates: list[YouTubeVideo]) -> list[YouTubeVideo]:

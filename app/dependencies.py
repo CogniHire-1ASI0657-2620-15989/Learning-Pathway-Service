@@ -1,4 +1,5 @@
 from collections.abc import AsyncGenerator
+from functools import lru_cache
 
 from fastapi import HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -13,6 +14,8 @@ from app.infrastructure.clients.gap_analysis_service_client import GapAnalysisSe
 from app.infrastructure.clients.identity_service_client import IdentityServiceClient
 from app.infrastructure.clients.youtube_data_api_client import YouTubeDataApiClient
 from app.infrastructure.configuration.settings import get_settings
+from app.infrastructure.cache.redis_json_cache import RedisJsonCache
+from app.infrastructure.resilience.circuit_breaker import CircuitBreaker
 from app.infrastructure.persistence.sqlalchemy.database import get_session
 from app.infrastructure.persistence.sqlalchemy.repositories.sqlalchemy_learning_path_repository import SQLAlchemyLearningPathRepository
 from app.infrastructure.persistence.sqlalchemy.repositories.sqlalchemy_certificate_repository import SQLAlchemyCertificateRepository
@@ -22,6 +25,16 @@ from app.infrastructure.ocr.tesseract_certificate_text_extractor import Tesserac
 async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
     async for session in get_session():
         yield session
+
+
+@lru_cache
+def get_redis_cache() -> RedisJsonCache:
+    return RedisJsonCache(get_settings().redis_url)
+
+
+@lru_cache
+def get_youtube_circuit_breaker() -> CircuitBreaker:
+    return CircuitBreaker()
 
 
 def get_current_user_id(request: Request) -> int:
@@ -46,7 +59,11 @@ def get_learning_path_recommendation_service() -> DefaultLearningPathRecommendat
             settings.gateway_user_id_header,
             settings.internal_api_key,
         ),
-        youtube_video_search_client=YouTubeDataApiClient(settings.youtube_data_api_key),
+        youtube_video_search_client=YouTubeDataApiClient(
+            settings.youtube_data_api_key,
+            get_redis_cache(),
+            get_youtube_circuit_breaker(),
+        ),
     )
 
 

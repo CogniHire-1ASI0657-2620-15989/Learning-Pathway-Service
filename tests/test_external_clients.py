@@ -11,6 +11,7 @@ from app.application.internal.command_services.default_learning_path_recommendat
 )
 from app.infrastructure.clients.gap_analysis_service_client import GapAnalysisServiceClient
 from app.infrastructure.clients.youtube_data_api_client import YouTubeDataApiClient
+from app.infrastructure.resilience.circuit_breaker import CircuitBreaker
 
 
 @respx.mock
@@ -103,6 +104,21 @@ async def test_searches_youtube_videos_by_skill() -> None:
             thumbnail_url="https://img.example/sql.jpg",
         )
     ]
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_opens_youtube_circuit_after_three_failures() -> None:
+    route = respx.get("https://www.googleapis.com/youtube/v3/search").mock(return_value=Response(503))
+    client = YouTubeDataApiClient("test-key", breaker=CircuitBreaker())
+
+    for _ in range(3):
+        with pytest.raises(RuntimeError, match="unavailable"):
+            await client.search_videos("SQL", 3)
+    with pytest.raises(RuntimeError, match="circuit breaker is open"):
+        await client.search_videos("SQL", 3)
+
+    assert route.call_count == 3
 
 
 class FakeGapAnalysisClient:
